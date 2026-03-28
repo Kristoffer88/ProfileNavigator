@@ -8,7 +8,7 @@ enum RememberMode: CaseIterable {
 
     func next() -> RememberMode {
         let all = RememberMode.allCases
-        let idx = all.firstIndex(of: self)!
+        let idx = all.firstIndex(of: self) ?? 0
         return all[(idx + 1) % all.count]
     }
 }
@@ -96,16 +96,24 @@ class PickerWindowController: NSWindowController {
         super.init(window: panel)
 
         st.onConfirm = { [weak self] profile, rememberMode in
-            if let host = url.host, !host.isEmpty {
+            let ruleKey: String?
+            if url.scheme == "file" {
                 switch rememberMode {
-                case .site:
-                    ConfigStore.shared.setRule(host: host, profileId: profile.id)
-                case .page:
-                    let key = host + url.path
-                    ConfigStore.shared.setRule(host: key, profileId: profile.id)
-                case .never:
-                    break
+                case .site:  ruleKey = url.deletingLastPathComponent().path
+                case .page:  ruleKey = url.path
+                case .never: ruleKey = nil
                 }
+            } else if let host = url.host, !host.isEmpty {
+                switch rememberMode {
+                case .site:  ruleKey = host
+                case .page:  ruleKey = host + url.path
+                case .never: ruleKey = nil
+                }
+            } else {
+                ruleKey = nil
+            }
+            if let key = ruleKey {
+                ConfigStore.shared.setRule(host: key, profileId: profile.id)
             }
             BrowserLauncher.open(url: url, profile: profile)
             self?.close()

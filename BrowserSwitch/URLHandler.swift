@@ -6,12 +6,20 @@ class URLHandler {
     private var pickerController: PickerWindowController?
 
     func handle(url: URL) {
-        let host = url.host ?? ""
-        let path = url.path
         let rules = ConfigStore.shared.config.rules ?? [:]
 
-        // Check page-level rule first (host + path), then host-level
-        let ruleKey = rules[host + path] != nil ? host + path : host
+        // For file:// URLs, check path then parent directory; for http(s), check host+path then host
+        let ruleKey: String
+        if url.scheme == "file" {
+            let path = url.path
+            let dir = url.deletingLastPathComponent().path
+            ruleKey = rules[path] != nil ? path : dir
+        } else {
+            let host = url.host ?? ""
+            let hostPath = host + url.path
+            ruleKey = rules[hostPath] != nil ? hostPath : host
+        }
+
         if let profileId = rules[ruleKey] {
             let profiles = ProfileDetector.visible()
             if let profile = profiles.first(where: { $0.id == profileId }) {

@@ -4,8 +4,9 @@ struct PickerView: View {
     let url: URL
     @ObservedObject var state: PickerState
 
-    var host: String { url.host ?? url.absoluteString }
     var displayURL: String {
+        if url.scheme == "file" { return url.path }
+        let host = url.host ?? url.absoluteString
         let path = url.path
         guard !path.isEmpty, path != "/" else { return host }
         return host + path

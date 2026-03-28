@@ -40,6 +40,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
               let url = URL(string: urlString) else { return }
         URLHandler.shared.handle(url: url)
     }
+
+    func application(_ sender: NSApplication, openFile filename: String) -> Bool {
+        URLHandler.shared.handle(url: URL(fileURLWithPath: filename))
+        return true
+    }
 }
 
 // Called by SettingsWindowController to toggle the app's visibility in the menu bar
