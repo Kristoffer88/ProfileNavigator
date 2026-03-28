@@ -2,17 +2,17 @@ import Foundation
 
 func printUsage() {
     print("""
-    browserswitch — manage BrowserSwitch profiles and rules
+    profilenavigator — manage Profile Navigator profiles and rules
 
     Usage:
-      browserswitch profiles                    List all detected profiles
-      browserswitch default get                 Show current default profile
-      browserswitch default set <id>            Set default profile
-      browserswitch rules list                  List remembered domain rules
-      browserswitch rules remove <host>         Remove a domain rule
-      browserswitch filter list                 Show visible profiles filter
-      browserswitch filter set <id> [<id>...]   Show only these profiles in picker
-      browserswitch filter clear                Show all profiles (remove filter)
+      profilenavigator profiles                    List all detected profiles
+      profilenavigator default get                 Show current default profile
+      profilenavigator default set <id>            Set default profile
+      profilenavigator rules list                  List remembered domain rules
+      profilenavigator rules remove <host>         Remove a domain rule
+      profilenavigator filter list                 Show visible profiles filter
+      profilenavigator filter set <id> [<id>...]   Show only these profiles in picker
+      profilenavigator filter clear                Show all profiles (remove filter)
     """)
 }
 
@@ -46,7 +46,7 @@ case "default":
         print(store.config.defaultProfileId ?? "(none)")
     case "set":
         guard let id = args.dropFirst(2).first else {
-            print("Usage: browserswitch default set <profile-id>")
+            print("Usage: profilenavigator default set <profile-id>")
             exit(1)
         }
         store.setDefault(profileId: id)
@@ -70,7 +70,7 @@ case "rules":
         }
     case "remove":
         guard let host = args.dropFirst(2).first else {
-            print("Usage: browserswitch rules remove <host>")
+            print("Usage: profilenavigator rules remove <host>")
             exit(1)
         }
         store.removeRule(host: host)
@@ -93,7 +93,7 @@ case "filter":
     case "set":
         let ids = Array(args.dropFirst(2))
         guard !ids.isEmpty else {
-            print("Usage: browserswitch filter set <id> [<id>...]")
+            print("Usage: profilenavigator filter set <id> [<id>...]")
             exit(1)
         }
         store.setVisibleProfiles(ids)

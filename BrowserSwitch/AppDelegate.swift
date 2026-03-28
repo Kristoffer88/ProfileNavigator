@@ -22,7 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let appMenu = NSMenu()
         appMenu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Quit BrowserSwitch", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: "Quit Profile Navigator", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
         let appMenuItem = NSMenuItem()
         appMenuItem.submenu = appMenu

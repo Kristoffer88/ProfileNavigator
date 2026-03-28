@@ -19,7 +19,7 @@ class ConfigStore {
 
     private let configURL: URL = {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = support.appendingPathComponent("BrowserSwitch")
+        let dir = support.appendingPathComponent("ProfileNavigator")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("config.json")
     }()

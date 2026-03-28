@@ -6,7 +6,7 @@ class StatusBarController {
     init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "safari", accessibilityDescription: "BrowserSwitch")
+            button.image = NSImage(systemSymbolName: "safari", accessibilityDescription: "Profile Navigator")
             button.image?.isTemplate = true
         }
         rebuildMenu()
@@ -56,7 +56,7 @@ class StatusBarController {
         menu.addItem(.separator())
         let settings = menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         settings.target = self
-        menu.addItem(withTitle: "Quit BrowserSwitch", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        menu.addItem(withTitle: "Quit Profile Navigator", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
         statusItem.menu = menu
     }

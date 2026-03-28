@@ -1,4 +1,4 @@
-name: BrowserSwitch
+name: ProfileNavigator
 options:
   bundleIdPrefix: com.kristoffer
   deploymentTarget:
@@ -11,7 +11,7 @@ settings:
     MACOSX_DEPLOYMENT_TARGET: "13.0"
 
 targets:
-  BrowserSwitch:
+  ProfileNavigator:
     type: application
     platform: macOS
     sources:
@@ -19,7 +19,7 @@ targets:
       - path: Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.BrowserSwitch
+        PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.ProfileNavigator
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
         INFOPLIST_FILE: BrowserSwitch/Info.plist
@@ -28,7 +28,7 @@ targets:
         ENABLE_HARDENED_RUNTIME: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 
-  browserswitch:
+  profilenavigator:
     type: tool
     platform: macOS
     sources:
@@ -36,5 +36,5 @@ targets:
       - path: Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.browserswitch
+        PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.profilenavigator
         INSTALL_PATH: /usr/local/bin

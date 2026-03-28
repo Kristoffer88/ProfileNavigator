@@ -1,8 +1,8 @@
-# BrowserSwitch
+# Profile Navigator
 
 A macOS menu bar app that intercepts links and lets you pick which browser profile to open them in.
 
-When you click a link anywhere on your Mac, BrowserSwitch shows a small picker instead of opening your default browser directly. Select a profile, optionally save the choice for that domain, and the link opens in the right browser profile.
+When you click a link anywhere on your Mac, Profile Navigator shows a small picker instead of opening your default browser directly. Select a profile, optionally save the choice for that domain, and the link opens in the right browser profile.
 
 ## Features
 
@@ -24,16 +24,16 @@ When you click a link anywhere on your Mac, BrowserSwitch shows a small picker i
 1. Install [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
 2. Clone the repo and generate the Xcode project:
    ```
-   git clone https://github.com/kristoffer/BrowserSwitch
-   cd BrowserSwitch
+   git clone https://github.com/kristoffer88/ProfileNavigator
+   cd ProfileNavigator
    xcodegen
    ```
-3. Open `BrowserSwitch.xcodeproj` and build (⌘B)
-4. Copy `BrowserSwitch.app` to `/Applications`
+3. Open `ProfileNavigator.xcodeproj` and build (⌘B)
+4. Copy `Profile Navigator.app` to `/Applications`
 
 ### Set as default browser
 
-Open **System Settings → Desktop & Dock → Default web browser** and select BrowserSwitch.
+Open **System Settings → Desktop & Dock → Default web browser** and select Profile Navigator.
 
 ## Usage
 
@@ -49,27 +49,27 @@ Click any link — the picker appears. Use the keyboard or click to choose a pro
 
 ### Menu bar
 
-Click the BrowserSwitch icon in the menu bar to set a default profile or remove remembered rules. Open **Settings** (⌘,) to manage visible profiles and rename them.
+Click the Profile Navigator icon in the menu bar to set a default profile or remove remembered rules. Open **Settings** (⌘,) to manage visible profiles and rename them.
 
 ### CLI
 
 A companion CLI tool is included for scripting:
 
 ```
-browserswitch profiles                    # list detected profiles
-browserswitch default get                 # show current default
-browserswitch default set <id>            # set default profile
-browserswitch rules list                  # show remembered domain rules
-browserswitch rules remove <host>         # remove a rule
-browserswitch filter set <id> [<id>...]   # show only specific profiles
-browserswitch filter clear                # show all profiles
+profilenavigator profiles                    # list detected profiles
+profilenavigator default get                 # show current default
+profilenavigator default set <id>            # set default profile
+profilenavigator rules list                  # show remembered domain rules
+profilenavigator rules remove <host>         # remove a rule
+profilenavigator filter set <id> [<id>...]   # show only specific profiles
+profilenavigator filter clear                # show all profiles
 ```
 
 ## How it works
 
-BrowserSwitch registers itself as the handler for `http://` and `https://` URLs. When a link is opened, it reads browser profile data from `~/Library/Application Support/<browser>/Local State`, presents the picker, then launches the chosen browser via `/usr/bin/open -a <browser> --args --profile-directory=<dir>`.
+Profile Navigator registers itself as the handler for `http://` and `https://` URLs. When a link is opened, it reads browser profile data from `~/Library/Application Support/<browser>/Local State`, presents the picker, then launches the chosen browser via `/usr/bin/open -a <browser> --args --profile-directory=<dir>`.
 
-Config is stored at `~/Library/Application Support/BrowserSwitch/config.json`.
+Config is stored at `~/Library/Application Support/ProfileNavigator/config.json`.
 
 ## License
 

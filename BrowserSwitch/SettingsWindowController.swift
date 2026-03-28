@@ -51,7 +51,7 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "BrowserSwitch"
+        window.title = "Profile Navigator"
         window.isReleasedWhenClosed = false
         super.init(window: window)
         window.delegate = self
