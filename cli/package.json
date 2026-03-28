@@ -1,0 +1,11 @@
+{
+  "name": "profilenavigator-cli",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "profilenavigator": "./src/index.ts"
+  },
+  "dependencies": {
+    "commander": "^14.0.0"
+  }
+}

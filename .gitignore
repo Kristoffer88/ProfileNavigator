@@ -1,6 +1,9 @@
 # opensrc - source code for packages
 opensrc/
 
+# Node / Bun
+node_modules/
+
 # Xcode
 DerivedData/
 *.xcuserdata/
