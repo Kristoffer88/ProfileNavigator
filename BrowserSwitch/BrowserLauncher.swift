@@ -11,6 +11,10 @@ enum BrowserLauncher {
             "--profile-directory=\(profile.directoryName)",
             url.absoluteString
         ]
-        try? task.run()
+        do {
+            try task.run()
+        } catch {
+            NSLog("BrowserLauncher: failed to open %@ — %@", url.absoluteString, error.localizedDescription)
+        }
     }
 }

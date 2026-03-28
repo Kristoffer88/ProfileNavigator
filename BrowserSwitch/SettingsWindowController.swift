@@ -56,8 +56,9 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         super.init(window: window)
         window.delegate = self
         window.vm = vm
-        window.contentView = NSHostingView(rootView: SettingsView(vm: vm))
-        window.setContentSize(window.contentView!.fittingSize)
+        let contentView = NSHostingView(rootView: SettingsView(vm: vm))
+        window.contentView = contentView
+        window.setContentSize(contentView.fittingSize)
     }
 
     required init?(coder: NSCoder) { fatalError() }

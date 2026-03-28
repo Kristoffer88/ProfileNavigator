@@ -54,5 +54,11 @@ guard let tiff = image.tiffRepresentation,
       let png = bmp.representation(using: .png, properties: [:]) else {
     print("Failed to render image"); exit(1)
 }
-try! png.write(to: URL(fileURLWithPath: "/tmp/bs_icon_1024.png"))
-print("Saved /tmp/bs_icon_1024.png")
+let outURL = FileManager.default.temporaryDirectory.appendingPathComponent("bs_icon_1024.png")
+do {
+    try png.write(to: outURL)
+    print("Saved \(outURL.path)")
+} catch {
+    print("Failed to write icon: \(error)")
+    exit(1)
+}
