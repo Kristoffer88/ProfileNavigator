@@ -1,0 +1,9 @@
+# opensrc - source code for packages
+opensrc/
+
+# Xcode
+DerivedData/
+*.xcuserdata/
+build/
+.DS_Store
+*.xcworkspace/xcshareddata/xcuserstate
