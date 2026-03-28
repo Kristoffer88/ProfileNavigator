@@ -40,9 +40,13 @@ enum ProfileDetector {
 
         var profiles: [Profile] = []
 
+        let homeApps = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Applications").path
+
         for browser in knownBrowsers {
-            let appPath = "/Applications/\(browser.appName).app"
-            guard FileManager.default.fileExists(atPath: appPath) else { continue }
+            let appName = "\(browser.appName).app"
+            guard FileManager.default.fileExists(atPath: "/Applications/\(appName)")
+                || FileManager.default.fileExists(atPath: "\(homeApps)/\(appName)") else { continue }
 
             let localState = support
                 .appendingPathComponent(browser.dataPath)
