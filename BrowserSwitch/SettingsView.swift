@@ -1,5 +1,8 @@
 import SwiftUI
 
+private let profileRowHeight: CGFloat = 40
+private let ruleRowHeight: CGFloat = 36
+
 struct SettingsView: View {
     @ObservedObject var vm: SettingsViewModel
 
@@ -29,7 +32,7 @@ struct SettingsView: View {
                 .onMove { vm.move(from: $0, to: $1) }
             }
             .listStyle(.inset)
-            .frame(height: max(80, CGFloat(vm.visibleProfiles.count) * 40 + 4))
+            .frame(height: max(80, CGFloat(vm.visibleProfiles.count) * profileRowHeight + 4))
 
             SectionFooter(hint: "⌘↑↓ reorder   Space default   ↩ rename") {
                 if let id = vm.profileSelection,
@@ -57,7 +60,7 @@ struct SettingsView: View {
                 }
             }
             .listStyle(.inset)
-            .frame(height: max(50, CGFloat(max(vm.rules.count, 1)) * 36 + 4))
+            .frame(height: max(50, CGFloat(max(vm.rules.count, 1)) * ruleRowHeight + 4))
 
             SectionFooter(hint: "⌫ to remove") {
                 if let domain = vm.ruleSelection,
@@ -69,6 +72,13 @@ struct SettingsView: View {
         }
         .padding(16)
         .frame(width: 480)
+        .safeAreaInset(edge: .bottom) {
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+            Text("Version \(version)")
+                .font(.caption2).foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.horizontal, 16).padding(.bottom, 10)
+        }
         .onDeleteCommand {
             if let id = vm.profileSelection,
                let p = vm.visibleProfiles.first(where: { $0.id == id }) {
