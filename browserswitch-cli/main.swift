@@ -60,7 +60,7 @@ case "rules":
     let sub = args.dropFirst().first
     switch sub {
     case "list":
-        let rules = store.config.rules
+        let rules = store.config.rules ?? [:]
         if rules.isEmpty {
             print("No remembered rules.")
         } else {

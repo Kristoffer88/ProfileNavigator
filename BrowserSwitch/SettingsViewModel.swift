@@ -35,7 +35,7 @@ class SettingsViewModel: ObservableObject {
             visibleProfiles = allDetectedProfiles
         }
 
-        rules = config.rules
+        rules = (config.rules ?? [:])
             .map { DomainRule(domain: $0.key, profileId: $0.value) }
             .sorted { $0.domain < $1.domain }
     }

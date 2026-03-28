@@ -2,13 +2,13 @@ import Foundation
 
 struct Config: Codable {
     var defaultProfileId: String?
-    var rules: [String: String]              // host → profile id
+    var rules: [String: String]?             // host → profile id
     var visibleProfileIds: [String]?         // nil = show all
     var displayNameOverrides: [String: String]?  // profile id → custom name
 
     init() {
         defaultProfileId = nil
-        rules = [:]
+        rules = nil
         visibleProfileIds = nil
         displayNameOverrides = nil
     }
@@ -43,13 +43,14 @@ class ConfigStore {
 
     func setRule(host: String, profileId: String) {
         var c = config
-        c.rules[host] = profileId
+        if c.rules == nil { c.rules = [:] }
+        c.rules![host] = profileId
         config = c
     }
 
     func removeRule(host: String) {
         var c = config
-        c.rules.removeValue(forKey: host)
+        c.rules?.removeValue(forKey: host)
         config = c
     }
 

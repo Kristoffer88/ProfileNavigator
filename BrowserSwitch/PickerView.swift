@@ -5,6 +5,11 @@ struct PickerView: View {
     @ObservedObject var state: PickerState
 
     var host: String { url.host ?? url.absoluteString }
+    var displayURL: String {
+        let path = url.path
+        guard !path.isEmpty, path != "/" else { return host }
+        return host + path
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -13,7 +18,7 @@ struct PickerView: View {
                 Image(systemName: "link")
                     .foregroundStyle(.secondary)
                     .font(.caption)
-                Text(host)
+                Text(displayURL)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -45,14 +50,13 @@ struct PickerView: View {
 
             Divider()
 
-            // Hint footer
-            HStack(spacing: 0) {
-                Image(systemName: state.remember ? "checkmark.square.fill" : "square")
-                    .foregroundStyle(state.remember ? Color.accentColor : .secondary)
-                    .font(.caption)
-                Text(" Remember")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            // Remember mode footer
+            HStack(spacing: 6) {
+                ForEach(RememberMode.allCases, id: \.self) { mode in
+                    RememberModeButton(mode: mode, isSelected: state.rememberMode == mode) {
+                        state.rememberMode = mode
+                    }
+                }
 
                 Spacer()
 
@@ -72,6 +76,35 @@ struct PickerView: View {
 
     private func hintKey(_ label: String) -> Text {
         Text(label).fontWeight(.medium)
+    }
+}
+
+private struct RememberModeButton: View {
+    let mode: RememberMode
+    let isSelected: Bool
+    let action: () -> Void
+
+    var label: String {
+        switch mode {
+        case .site:  return "This site"
+        case .page:  return "This page"
+        case .never: return "Just once"
+        }
+    }
+
+    var body: some View {
+        Button(action: action) {
+            Text(label)
+                .font(.caption)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(isSelected ? Color.accentColor.opacity(0.15) : Color.secondary.opacity(0.08))
+                )
+                .foregroundStyle(isSelected ? Color.accentColor : .secondary)
+        }
+        .buttonStyle(.plain)
     }
 }
 

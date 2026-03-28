@@ -7,10 +7,12 @@ class URLHandler {
 
     func handle(url: URL) {
         let host = url.host ?? ""
-        let config = ConfigStore.shared.config
+        let path = url.path
+        let rules = ConfigStore.shared.config.rules ?? [:]
 
-        // Use remembered rule if one exists
-        if let profileId = config.rules[host] {
+        // Check page-level rule first (host + path), then host-level
+        let ruleKey = rules[host + path] != nil ? host + path : host
+        if let profileId = rules[ruleKey] {
             let profiles = ProfileDetector.visible()
             if let profile = profiles.first(where: { $0.id == profileId }) {
                 BrowserLauncher.open(url: url, profile: profile)

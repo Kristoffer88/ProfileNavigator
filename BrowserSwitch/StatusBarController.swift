@@ -38,7 +38,7 @@ class StatusBarController {
         let rulesItem = menu.addItem(withTitle: "Remembered Rules", action: nil, keyEquivalent: "")
         rulesItem.isEnabled = false
 
-        let rules = ConfigStore.shared.config.rules
+        let rules = ConfigStore.shared.config.rules ?? [:]
         if rules.isEmpty {
             let none = menu.addItem(withTitle: "  (none)", action: nil, keyEquivalent: "")
             none.isEnabled = false

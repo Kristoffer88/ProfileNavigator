@@ -1,12 +1,24 @@
 import Cocoa
 import SwiftUI
 
+enum RememberMode: CaseIterable {
+    case site   // remember host only
+    case page   // remember host + path
+    case never  // just open, no rule saved
+
+    func next() -> RememberMode {
+        let all = RememberMode.allCases
+        let idx = all.firstIndex(of: self)!
+        return all[(idx + 1) % all.count]
+    }
+}
+
 // Shared state between NSPanel key handling and SwiftUI view
 class PickerState: ObservableObject {
     @Published var selectedIndex: Int
-    @Published var remember: Bool = true
+    @Published var rememberMode: RememberMode = .site
     let profiles: [Profile]
-    var onConfirm: ((Profile, Bool) -> Void)?
+    var onConfirm: ((Profile, RememberMode) -> Void)?
     var onCancel: (() -> Void)?
 
     init(profiles: [Profile], defaultProfile: Profile?) {
@@ -17,7 +29,7 @@ class PickerState: ObservableObject {
     func confirm() {
         guard !profiles.isEmpty else { return }
         let profile = profiles[selectedIndex]
-        onConfirm?(profile, remember)
+        onConfirm?(profile, rememberMode)
     }
 
     func moveSelection(by delta: Int) {
@@ -47,13 +59,13 @@ private class PickerPanel: NSPanel {
         case 53: // Esc
             state.onCancel?()
         case 48: // Tab
-            state.remember.toggle()
+            state.rememberMode = state.rememberMode.next()
         default:
             if let n = Int(chars), n >= 1 && n <= state.profiles.count {
                 state.selectedIndex = n - 1
                 state.confirm()
             } else if chars.lowercased() == "r" {
-                state.remember.toggle()
+                state.rememberMode = state.rememberMode.next()
             } else {
                 super.keyDown(with: event)
             }
@@ -83,9 +95,17 @@ class PickerWindowController: NSWindowController {
 
         super.init(window: panel)
 
-        st.onConfirm = { [weak self] profile, remember in
-            if remember, let host = url.host, !host.isEmpty {
-                ConfigStore.shared.setRule(host: host, profileId: profile.id)
+        st.onConfirm = { [weak self] profile, rememberMode in
+            if let host = url.host, !host.isEmpty {
+                switch rememberMode {
+                case .site:
+                    ConfigStore.shared.setRule(host: host, profileId: profile.id)
+                case .page:
+                    let key = host + url.path
+                    ConfigStore.shared.setRule(host: key, profileId: profile.id)
+                case .never:
+                    break
+                }
             }
             BrowserLauncher.open(url: url, profile: profile)
             self?.close()
