@@ -5,6 +5,7 @@ enum RememberMode: CaseIterable {
     case site   // remember host only
     case page   // remember host + path
     case never  // just open, no rule saved
+    case block  // add host to blocklist, never ask again
 
     func next() -> RememberMode {
         let all = RememberMode.allCases
@@ -101,19 +102,22 @@ class PickerWindowController: NSWindowController {
                 switch rememberMode {
                 case .site:  ruleKey = url.deletingLastPathComponent().path
                 case .page:  ruleKey = url.path
-                case .never: ruleKey = nil
+                case .never, .block: ruleKey = nil
                 }
             } else if let host = url.host, !host.isEmpty {
                 switch rememberMode {
                 case .site:  ruleKey = host
                 case .page:  ruleKey = host + url.path
-                case .never: ruleKey = nil
+                case .never, .block: ruleKey = nil
                 }
             } else {
                 ruleKey = nil
             }
             if let key = ruleKey {
                 ConfigStore.shared.setRule(host: key, profileId: profile.id)
+            }
+            if rememberMode == .block, let host = url.host, !host.isEmpty {
+                ConfigStore.shared.addToBlocklist(host: host)
             }
             BrowserLauncher.open(url: url, profile: profile)
             self?.close()

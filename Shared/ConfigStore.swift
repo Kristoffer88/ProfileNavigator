@@ -3,6 +3,7 @@ import Foundation
 struct Config: Codable {
     var defaultProfileId: String?
     var rules: [String: String]?             // host → profile id
+    var blocklist: [String]?                 // hosts to never show picker for
     var visibleProfileIds: [String]?         // nil = show all
     var displayNameOverrides: [String: String]?  // profile id → custom name
 
@@ -52,6 +53,19 @@ class ConfigStore {
     func removeRule(host: String) {
         var c = config
         c.rules?.removeValue(forKey: host)
+        config = c
+    }
+
+    func addToBlocklist(host: String) {
+        var c = config
+        if c.blocklist == nil { c.blocklist = [] }
+        if !c.blocklist!.contains(host) { c.blocklist!.append(host) }
+        config = c
+    }
+
+    func removeFromBlocklist(host: String) {
+        var c = config
+        c.blocklist?.removeAll { $0 == host }
         config = c
     }
 

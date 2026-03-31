@@ -69,6 +69,32 @@ struct SettingsView: View {
                         .foregroundColor(.red).buttonStyle(.plain).font(.callout)
                 }
             }
+
+            Divider().padding(.vertical, 8)
+
+            // ── Never Ask ─────────────────────────────────────────
+            SectionHeader(title: "Never Ask") { EmptyView() }
+
+            List(selection: $vm.blocklistSelection) {
+                if vm.blockedHosts.isEmpty {
+                    Text("No blocked sites.")
+                        .foregroundStyle(.secondary).font(.callout)
+                        .listRowSeparator(.hidden)
+                } else {
+                    ForEach(vm.blockedHosts, id: \.self) { host in
+                        Text(host).padding(.vertical, 2).tag(host)
+                    }
+                }
+            }
+            .listStyle(.inset)
+            .frame(height: max(50, CGFloat(max(vm.blockedHosts.count, 1)) * ruleRowHeight + 4))
+
+            SectionFooter(hint: "⌫ to remove") {
+                if let host = vm.blocklistSelection {
+                    Button("Remove") { vm.removeBlockedHost(host); vm.blocklistSelection = nil }
+                        .foregroundColor(.red).buttonStyle(.plain).font(.callout)
+                }
+            }
         }
         .padding(16)
         .frame(width: 480)
@@ -86,6 +112,8 @@ struct SettingsView: View {
             } else if let domain = vm.ruleSelection,
                       let rule = vm.rules.first(where: { $0.domain == domain }) {
                 vm.removeRule(rule); vm.ruleSelection = nil
+            } else if let host = vm.blocklistSelection {
+                vm.removeBlockedHost(host); vm.blocklistSelection = nil
             }
         }
     }

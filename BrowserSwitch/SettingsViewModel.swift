@@ -10,9 +10,11 @@ class SettingsViewModel: ObservableObject {
     @Published var visibleProfiles: [Profile] = []
     @Published var defaultProfileId: String?
     @Published var rules: [DomainRule] = []
+    @Published var blockedHosts: [String] = []
     // Selection and edit state owned here so NSWindow keyDown can drive them
     @Published var profileSelection: Profile.ID?
     @Published var ruleSelection: String?
+    @Published var blocklistSelection: String?
     @Published var editingProfileId: Profile.ID?
 
     private(set) var allDetectedProfiles: [Profile] = []
@@ -38,6 +40,7 @@ class SettingsViewModel: ObservableObject {
         rules = (config.rules ?? [:])
             .map { DomainRule(domain: $0.key, profileId: $0.value) }
             .sorted { $0.domain < $1.domain }
+        blockedHosts = (config.blocklist ?? []).sorted()
     }
 
     // MARK: - Display names
@@ -105,6 +108,11 @@ class SettingsViewModel: ObservableObject {
     func removeRule(_ rule: DomainRule) {
         ConfigStore.shared.removeRule(host: rule.domain)
         rules.removeAll { $0.id == rule.id }
+    }
+
+    func removeBlockedHost(_ host: String) {
+        ConfigStore.shared.removeFromBlocklist(host: host)
+        blockedHosts.removeAll { $0 == host }
     }
 
     // MARK: - Display name for a rule's target profile

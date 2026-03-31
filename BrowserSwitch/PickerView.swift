@@ -90,6 +90,7 @@ private struct RememberModeButton: View {
         case .site:  return "This site"
         case .page:  return "This page"
         case .never: return "Just once"
+        case .block: return "Never"
         }
     }
 

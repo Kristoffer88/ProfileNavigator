@@ -6,7 +6,18 @@ class URLHandler {
     private var pickerController: PickerWindowController?
 
     func handle(url: URL) {
-        let rules = ConfigStore.shared.config.rules ?? [:]
+        let config = ConfigStore.shared.config
+        let host = url.host ?? ""
+        if !host.isEmpty && (config.blocklist ?? []).contains(host) {
+            let profiles = ProfileDetector.visible()
+            let defaultId = config.defaultProfileId
+            if let profile = profiles.first(where: { $0.id == defaultId }) ?? profiles.first {
+                BrowserLauncher.open(url: url, profile: profile)
+            }
+            return
+        }
+
+        let rules = config.rules ?? [:]
 
         // For file:// URLs, check path then parent directory; for http(s), check host+path then host
         let ruleKey: String
@@ -15,7 +26,6 @@ class URLHandler {
             let dir = url.deletingLastPathComponent().path
             ruleKey = rules[path] != nil ? path : dir
         } else {
-            let host = url.host ?? ""
             let hostPath = host + url.path
             ruleKey = rules[hostPath] != nil ? hostPath : host
         }
