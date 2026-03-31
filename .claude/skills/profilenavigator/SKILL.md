@@ -12,10 +12,10 @@ description: |
 ## Setup
 
 ```bash
-cd /Users/kristoffer/repos/BrowserSwitch && bun run cli/src/index.ts <command>
+cd /Users/kristoffer/repos/ProfileNavigator && bun run cli/src/index.ts <command>
 ```
 
-Always prefix Bash commands with `cd /Users/kristoffer/repos/BrowserSwitch &&` — the tool does not preserve cwd.
+Always prefix Bash commands with `cd /Users/kristoffer/repos/ProfileNavigator &&` — the tool does not preserve cwd.
 
 ---
 

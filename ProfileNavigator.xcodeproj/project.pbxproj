@@ -29,7 +29,7 @@
 
 /* Begin PBXFileReference section */
 		083131959792E259ADABFA20 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
-		0A93A60103BAE2B3675898DD /* BrowserSwitch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrowserSwitch.entitlements; sourceTree = "<group>"; };
+		0A93A60103BAE2B3675898DD /* ProfileNavigator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ProfileNavigator.entitlements; sourceTree = "<group>"; };
 		0D41CDA63D4A5455332547C2 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		23820F10BF5FA4184F2C6401 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		26DC822490E7DEA2B655C93E /* URLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHandler.swift; sourceTree = "<group>"; };
@@ -53,20 +53,20 @@
 		1DBD1CA3BA29F2AC9A0752BD = {
 			isa = PBXGroup;
 			children = (
-				3E93BE9819F637EC235D8D27 /* BrowserSwitch */,
+				3E93BE9819F637EC235D8D27 /* ProfileNavigator */,
 				9C490BCAC0A89D5A82A1EEBE /* browserswitch-cli */,
 				441C2F2AF2CFA9EF6F1B8DC6 /* Shared */,
 				8288B919DD56E87718F37EF5 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		3E93BE9819F637EC235D8D27 /* BrowserSwitch */ = {
+		3E93BE9819F637EC235D8D27 /* ProfileNavigator */ = {
 			isa = PBXGroup;
 			children = (
 				9A478E2E785E119DCEAF8B8B /* AppDelegate.swift */,
 				6E28D8D5AE7D8C1C8C1DCDCA /* Assets.xcassets */,
 				F147C0DC0D048A7E5CB99325 /* BrowserLauncher.swift */,
-				0A93A60103BAE2B3675898DD /* BrowserSwitch.entitlements */,
+				0A93A60103BAE2B3675898DD /* ProfileNavigator.entitlements */,
 				ED1B72D82F76DC3954DA8A19 /* Info.plist */,
 				0D41CDA63D4A5455332547C2 /* main.swift */,
 				23820F10BF5FA4184F2C6401 /* PickerView.swift */,
@@ -77,7 +77,7 @@
 				FD876E5688D288F28269FE64 /* StatusBarController.swift */,
 				26DC822490E7DEA2B655C93E /* URLHandler.swift */,
 			);
-			path = BrowserSwitch;
+			path = ProfileNavigator;
 			sourceTree = "<group>";
 		};
 		441C2F2AF2CFA9EF6F1B8DC6 /* Shared */ = {
@@ -99,12 +99,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9C490BCAC0A89D5A82A1EEBE /* browserswitch-cli */ = {
+		9C490BCAC0A89D5A82A1EEBE /* profilenavigator-cli */ = {
 			isa = PBXGroup;
 			children = (
 				84D888049568A07C90F76DC3 /* main.swift */,
 			);
-			path = "browserswitch-cli";
+			path = "profilenavigator-cli";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,12 +243,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = BrowserSwitch/BrowserSwitch.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ProfileNavigator/ProfileNavigator.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = BrowserSwitch/Info.plist;
+				INFOPLIST_FILE = ProfileNavigator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -382,12 +382,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = BrowserSwitch/BrowserSwitch.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ProfileNavigator/ProfileNavigator.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = BrowserSwitch/Info.plist;
+				INFOPLIST_FILE = ProfileNavigator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
