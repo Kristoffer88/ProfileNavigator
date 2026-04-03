@@ -265,4 +265,25 @@ filterCmd
     }
   })
 
+// profilenavigator greet
+program
+  .command("greet")
+  .description("Greet the user and summarize available commands")
+  .action(() => {
+    console.log("Hello! I'm Profile Navigator — your macOS browser profile router.")
+    console.log("")
+    console.log("Here is what I can help you with:")
+    console.log("")
+    console.log("  profiles          List all detected browser profiles")
+    console.log("  default get/set   View or change the default profile")
+    console.log("  rules list        Show all domain → profile routing rules")
+    console.log("  rules set         Route a domain to a specific profile")
+    console.log("  rules remove      Remove a domain routing rule")
+    console.log("  filter list       Show the current picker filter")
+    console.log("  filter set        Limit which profiles appear in the picker")
+    console.log("  filter clear      Remove the picker filter (show all profiles)")
+    console.log("")
+    console.log("Run any command with --help for more details.")
+  })
+
 program.parse()
