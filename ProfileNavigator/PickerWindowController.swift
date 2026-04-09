@@ -17,7 +17,7 @@ enum RememberMode: CaseIterable {
 // Shared state between NSPanel key handling and SwiftUI view
 class PickerState: ObservableObject {
     @Published var selectedIndex: Int
-    @Published var rememberMode: RememberMode = .site
+    @Published var rememberMode: RememberMode = .never
     let profiles: [Profile]
     var onConfirm: ((Profile, RememberMode) -> Void)?
     var onCancel: (() -> Void)?

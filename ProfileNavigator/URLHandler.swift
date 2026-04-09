@@ -6,6 +6,7 @@ class URLHandler {
     private var pickerController: PickerWindowController?
 
     func handle(url: URL) {
+        let url = Self.unwrapSafeLinks(url) ?? url
         let config = ConfigStore.shared.config
         let host = url.host ?? ""
         if !host.isEmpty && (config.blocklist ?? []).contains(host) {
@@ -40,6 +41,27 @@ class URLHandler {
         }
 
         showPicker(for: url)
+    }
+
+    // MARK: - SafeLinks unwrapping
+
+    /// Extracts the real destination URL from Microsoft SafeLinks wrappers.
+    /// Teams: statics.teams.cdn.office.net/.../atp-safelinks.html?url=<encoded>
+    /// Outlook: *.safelinks.protection.outlook.com/?url=<encoded>
+    static func unwrapSafeLinks(_ url: URL) -> URL? {
+        guard let host = url.host?.lowercased() else { return nil }
+
+        let isSafeLink =
+            host.hasSuffix(".safelinks.protection.outlook.com") ||
+            (host.contains("teams.cdn.office.net") && url.path.contains("safelinks"))
+
+        guard isSafeLink,
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let encoded = components.queryItems?.first(where: { $0.name == "url" })?.value,
+              let decoded = URL(string: encoded)
+        else { return nil }
+
+        return decoded
     }
 
     private func showPicker(for url: URL) {
