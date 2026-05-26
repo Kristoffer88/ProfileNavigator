@@ -17,7 +17,7 @@ enum RememberMode: CaseIterable {
 // Shared state between NSPanel key handling and SwiftUI view
 class PickerState: ObservableObject {
     @Published var selectedIndex: Int
-    @Published var rememberMode: RememberMode = .site
+    @Published var rememberMode: RememberMode = .never
     let profiles: [Profile]
     var onConfirm: ((Profile, RememberMode) -> Void)?
     var onCancel: (() -> Void)?
@@ -95,6 +95,7 @@ class PickerWindowController: NSWindowController {
         panel.state = st
 
         super.init(window: panel)
+        panel.delegate = self
 
         st.onConfirm = { [weak self] profile, rememberMode in
             let ruleKey: String?
@@ -150,5 +151,11 @@ class PickerWindowController: NSWindowController {
             ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
             panel.animator().alphaValue = 1
         }
+    }
+}
+
+extension PickerWindowController: NSWindowDelegate {
+    func windowDidResignKey(_ notification: Notification) {
+        close()
     }
 }
