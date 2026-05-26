@@ -95,6 +95,7 @@ class PickerWindowController: NSWindowController {
         panel.state = st
 
         super.init(window: panel)
+        panel.delegate = self
 
         st.onConfirm = { [weak self] profile, rememberMode in
             let ruleKey: String?
@@ -150,5 +151,11 @@ class PickerWindowController: NSWindowController {
             ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
             panel.animator().alphaValue = 1
         }
+    }
+}
+
+extension PickerWindowController: NSWindowDelegate {
+    func windowDidResignKey(_ notification: Notification) {
+        close()
     }
 }

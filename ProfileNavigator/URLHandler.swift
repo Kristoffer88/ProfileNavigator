@@ -65,6 +65,7 @@ class URLHandler {
     }
 
     private func showPicker(for url: URL) {
+        pickerController?.close()
         let profiles = ProfileDetector.visible()
         let defaultId = ConfigStore.shared.config.defaultProfileId
         let defaultProfile = profiles.first(where: { $0.id == defaultId }) ?? profiles.first
