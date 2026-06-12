@@ -10,3 +10,8 @@ DerivedData/
 build/
 .DS_Store
 *.xcworkspace/xcshareddata/xcuserstate
+
+# Secrets
+.env
+
+xcuserdata/
