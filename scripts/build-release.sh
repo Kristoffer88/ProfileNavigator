@@ -8,7 +8,7 @@ SCHEME="ProfileNavigator"
 ARCHIVE_PATH="$PROJECT_DIR/build/$APP_NAME.xcarchive"
 EXPORT_PATH="$PROJECT_DIR/build/export"
 DMG_PATH="$PROJECT_DIR/build/$APP_NAME-$VERSION.dmg"
-SIGNED=${SIGNED:-false}  # Set SIGNED=true once Developer ID is available
+SIGNED=${SIGNED:-true}
 
 echo "==> Building $APP_NAME v$VERSION"
 
@@ -80,6 +80,14 @@ create-dmg \
   --skip-jenkins \
   "$DMG_PATH" \
   "$APP_PATH"
+
+if [ "$SIGNED" = "true" ]; then
+  echo "==> Signing DMG"
+  codesign --sign "Developer ID Application" "$DMG_PATH"
+  echo "==> Notarizing DMG"
+  xcrun notarytool submit "$DMG_PATH" --keychain-profile "ProfileNavigator" --wait
+  xcrun stapler staple "$DMG_PATH"
+fi
 
 SHA256=$(shasum -a 256 "$DMG_PATH" | awk '{print $1}')
 echo ""

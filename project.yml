@@ -25,6 +25,7 @@ targets:
         INFOPLIST_FILE: ProfileNavigator/Info.plist
         CODE_SIGN_ENTITLEMENTS: ProfileNavigator/ProfileNavigator.entitlements
         CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: QW83PV2H7U
         ENABLE_HARDENED_RUNTIME: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 
@@ -37,4 +38,5 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.profilenavigator
+        DEVELOPMENT_TEAM: QW83PV2H7U
         INSTALL_PATH: /usr/local/bin

@@ -154,7 +154,11 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					0C052B3D17D27C13A3E81254 = {
+						DevelopmentTeam = QW83PV2H7U;
+					};
 					7E0E87CD7C0F6CE54FC8A51A = {
+						DevelopmentTeam = QW83PV2H7U;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -229,6 +233,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = QW83PV2H7U;
 				INSTALL_PATH = /usr/local/bin;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -247,6 +252,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QW83PV2H7U;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ProfileNavigator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -386,6 +392,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QW83PV2H7U;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ProfileNavigator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -402,6 +409,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = QW83PV2H7U;
 				INSTALL_PATH = /usr/local/bin;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
