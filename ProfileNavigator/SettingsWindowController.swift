@@ -9,7 +9,10 @@ private class SettingsWindow: NSWindow {
 
     // sendEvent intercepts before the List (first responder) sees anything
     override func sendEvent(_ event: NSEvent) {
-        guard event.type == .keyDown, let vm, vm.editingProfileId == nil else {
+        guard event.type == .keyDown,
+              let vm,
+              vm.selectedTab == .profiles,
+              vm.editingProfileId == nil else {
             super.sendEvent(event)
             return
         }
@@ -20,7 +23,7 @@ private class SettingsWindow: NSWindow {
             moveSelected(vm, by: 1)
         case 126 where cmd: // Cmd+↑
             moveSelected(vm, by: -1)
-        case 36, 76 where vm.profileSelection != nil: // Return → rename
+        case 36 where vm.profileSelection != nil, 76 where vm.profileSelection != nil: // Return → rename
             vm.editingProfileId = vm.profileSelection
         case 49 where vm.profileSelection != nil: // Space → set default
             if let p = selectedProfile(vm) { vm.setDefault(p) }
@@ -41,12 +44,11 @@ private class SettingsWindow: NSWindow {
 }
 
 class SettingsWindowController: NSWindowController, NSWindowDelegate {
-    static let shared = SettingsWindowController()
     let vm = SettingsViewModel()
 
-    private init() {
+    init() {
         let window = SettingsWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 400),
+            contentRect: NSRect(x: 0, y: 0, width: 680, height: 520),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
@@ -56,6 +58,9 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         super.init(window: window)
         window.delegate = self
         window.vm = vm
+        window.minSize = NSSize(width: 640, height: 460)
+        window.maxSize = NSSize(width: 900, height: 760)
+
         let contentView = NSHostingView(rootView: SettingsView(vm: vm))
         window.contentView = contentView
         window.setContentSize(contentView.fittingSize)
@@ -63,14 +68,17 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
 
     required init?(coder: NSCoder) { fatalError() }
 
-    func open() {
+    func open(tab: SettingsTab? = nil) {
         if window?.isVisible == false { window?.center() }
         vm.reload()
+        if let tab { vm.selectedTab = tab }
         (NSApp.delegate as? AppDelegate)?.becomeVisibleApp()
         showWindow(nil)
     }
 
     func windowWillClose(_ notification: Notification) {
+        window?.contentView = nil
         (NSApp.delegate as? AppDelegate)?.becomeMenuBarApp()
+        (NSApp.delegate as? AppDelegate)?.settingsWindowDidClose(self)
     }
 }

@@ -6,12 +6,14 @@ struct Config: Codable {
     var blocklist: [String]?                 // hosts to never show picker for
     var visibleProfileIds: [String]?         // nil = show all
     var displayNameOverrides: [String: String]?  // profile id → custom name
+    var useProfileSymbolInMenuBar: Bool?         // nil/false = use browser symbol
 
     init() {
         defaultProfileId = nil
         rules = nil
         visibleProfileIds = nil
         displayNameOverrides = nil
+        useProfileSymbolInMenuBar = nil
     }
 }
 
@@ -72,6 +74,12 @@ class ConfigStore {
     func setDefault(profileId: String?) {
         var c = config
         c.defaultProfileId = profileId
+        config = c
+    }
+
+    func setUseProfileSymbolInMenuBar(_ enabled: Bool) {
+        var c = config
+        c.useProfileSymbolInMenuBar = enabled
         config = c
     }
 

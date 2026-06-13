@@ -5,11 +5,30 @@ class StatusBarController {
 
     init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "safari", accessibilityDescription: "Profile Navigator")
-            button.image?.isTemplate = true
-        }
+        refreshAppearance()
         rebuildMenu()
+    }
+
+    func refreshAppearance() {
+        guard let button = statusItem.button else { return }
+
+        if ConfigStore.shared.config.useProfileSymbolInMenuBar == true {
+            // Use a native template SF Symbol so macOS tints it like other status items.
+            statusItem.length = NSStatusItem.squareLength
+            button.title = ""
+            let image = NSImage(systemSymbolName: "person.crop.circle.badge.checkmark", accessibilityDescription: "Profile Navigator")
+                ?? NSImage(systemSymbolName: "person.crop.circle", accessibilityDescription: "Profile Navigator")
+            image?.isTemplate = true
+            button.image = image
+            button.imagePosition = .imageOnly
+        } else {
+            statusItem.length = NSStatusItem.squareLength
+            let image = NSImage(systemSymbolName: "safari", accessibilityDescription: "Profile Navigator")
+            image?.isTemplate = true
+            button.image = image
+            button.title = ""
+            button.imagePosition = .imageOnly
+        }
     }
 
     func rebuildMenu() {
@@ -35,23 +54,13 @@ class StatusBarController {
 
         menu.addItem(.separator())
 
-        let rulesItem = menu.addItem(withTitle: "Remembered Rules", action: nil, keyEquivalent: "")
-        rulesItem.isEnabled = false
+        let ruleCount = ConfigStore.shared.config.rules?.count ?? 0
+        let rulesTitle = ruleCount == 1 ? "1 Remembered Rule" : "\(ruleCount) Remembered Rules"
+        let rulesSummary = menu.addItem(withTitle: rulesTitle, action: nil, keyEquivalent: "")
+        rulesSummary.isEnabled = false
 
-        let rules = ConfigStore.shared.config.rules ?? [:]
-        if rules.isEmpty {
-            let none = menu.addItem(withTitle: "  (none)", action: nil, keyEquivalent: "")
-            none.isEnabled = false
-        } else {
-            for (host, profileId) in rules.sorted(by: { $0.key < $1.key }) {
-                let title = "  \(host)  →  \(profileId)"
-                let item = NSMenuItem(title: title, action: #selector(removeRule(_:)), keyEquivalent: "")
-                item.target = self
-                item.representedObject = host
-                item.toolTip = "Click to remove this rule"
-                menu.addItem(item)
-            }
-        }
+        let manageRules = menu.addItem(withTitle: "Manage Rules in Settings…", action: #selector(openRulesSettings), keyEquivalent: "")
+        manageRules.target = self
 
         menu.addItem(.separator())
         let settings = menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
@@ -67,13 +76,12 @@ class StatusBarController {
         rebuildMenu()
     }
 
-    @objc func removeRule(_ sender: NSMenuItem) {
-        guard let host = sender.representedObject as? String else { return }
-        ConfigStore.shared.removeRule(host: host)
-        rebuildMenu()
+    @objc func openSettings(_ sender: Any?) {
+        (NSApp.delegate as? AppDelegate)?.openSettingsWindow()
     }
 
-    @objc func openSettings(_ sender: Any?) {
-        SettingsWindowController.shared.open()
+    @objc func openRulesSettings(_ sender: Any?) {
+        (NSApp.delegate as? AppDelegate)?.openSettingsWindow(tab: .rules)
     }
+
 }

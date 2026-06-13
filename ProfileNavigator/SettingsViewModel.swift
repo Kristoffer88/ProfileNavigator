@@ -1,4 +1,4 @@
-import Foundation
+import Cocoa
 
 struct DomainRule: Identifiable {
     let domain: String
@@ -6,11 +6,19 @@ struct DomainRule: Identifiable {
     var id: String { domain }
 }
 
+enum SettingsTab: Hashable {
+    case profiles
+    case rules
+    case neverAsk
+}
+
 class SettingsViewModel: ObservableObject {
+    @Published var selectedTab: SettingsTab = .profiles
     @Published var visibleProfiles: [Profile] = []
     @Published var defaultProfileId: String?
     @Published var rules: [DomainRule] = []
     @Published var blockedHosts: [String] = []
+    @Published var useProfileSymbolInMenuBar = false
     // Selection and edit state owned here so NSWindow keyDown can drive them
     @Published var profileSelection: Profile.ID?
     @Published var ruleSelection: String?
@@ -30,6 +38,7 @@ class SettingsViewModel: ObservableObject {
         allDetectedProfiles = ProfileDetector.detect()
         let config = ConfigStore.shared.config
         defaultProfileId = config.defaultProfileId
+        useProfileSymbolInMenuBar = config.useProfileSymbolInMenuBar ?? false
 
         if let ids = config.visibleProfileIds, !ids.isEmpty {
             visibleProfiles = ids.compactMap { id in allDetectedProfiles.first(where: { $0.id == id }) }
@@ -97,6 +106,12 @@ class SettingsViewModel: ObservableObject {
         ConfigStore.shared.setDefault(profileId: profile.id)
     }
 
+    func setUseProfileSymbolInMenuBar(_ enabled: Bool) {
+        useProfileSymbolInMenuBar = enabled
+        ConfigStore.shared.setUseProfileSymbolInMenuBar(enabled)
+        (NSApp.delegate as? AppDelegate)?.statusBar?.refreshAppearance()
+    }
+
     private func saveVisibleProfiles() {
         var c = ConfigStore.shared.config
         c.visibleProfileIds = visibleProfiles.map(\.id)
@@ -104,6 +119,13 @@ class SettingsViewModel: ObservableObject {
     }
 
     // MARK: - Rules
+
+    func setRuleProfile(_ rule: DomainRule, profileId: String) {
+        ConfigStore.shared.setRule(host: rule.domain, profileId: profileId)
+        if let idx = rules.firstIndex(where: { $0.id == rule.id }) {
+            rules[idx] = DomainRule(domain: rule.domain, profileId: profileId)
+        }
+    }
 
     func removeRule(_ rule: DomainRule) {
         ConfigStore.shared.removeRule(host: rule.domain)

@@ -2,6 +2,7 @@ import Cocoa
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBar: StatusBarController?
+    private var settingsWindowController: SettingsWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusBar = StatusBarController()
@@ -32,7 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func openSettings() {
-        SettingsWindowController.shared.open()
+        openSettingsWindow()
     }
 
     @objc func handleURL(_ event: NSAppleEventDescriptor, replyEvent: NSAppleEventDescriptor) {
@@ -62,6 +63,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 // Called by SettingsWindowController to toggle the app's visibility in the menu bar
 extension AppDelegate {
+    func openSettingsWindow(tab: SettingsTab? = nil) {
+        if settingsWindowController == nil {
+            settingsWindowController = SettingsWindowController()
+        }
+        settingsWindowController?.open(tab: tab)
+    }
+
+    func settingsWindowDidClose(_ controller: SettingsWindowController) {
+        if settingsWindowController === controller {
+            settingsWindowController = nil
+        }
+    }
+
     func becomeVisibleApp() {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)

@@ -1,28 +1,113 @@
 import SwiftUI
 
+private let settingsWidth: CGFloat = 680
+private let settingsHeight: CGFloat = 520
 private let profileRowHeight: CGFloat = 40
-private let ruleRowHeight: CGFloat = 36
 
 struct SettingsView: View {
     @ObservedObject var vm: SettingsViewModel
 
     var body: some View {
         VStack(spacing: 0) {
-            // ── Profiles ──────────────────────────────────────────
-            SectionHeader(title: "Visible Profiles") {
+            TabView(selection: $vm.selectedTab) {
+                ProfilesSettingsPane(vm: vm)
+                    .tabItem { Label("Profiles", systemImage: "person.2") }
+                    .tag(SettingsTab.profiles)
+
+                RulesSettingsPane(vm: vm)
+                    .tabItem { Label("Rules", systemImage: "link") }
+                    .tag(SettingsTab.rules)
+
+                NeverAskSettingsPane(vm: vm)
+                    .tabItem { Label("Never Ask", systemImage: "hand.raised") }
+                    .tag(SettingsTab.neverAsk)
+            }
+            .padding(20)
+
+            Divider()
+
+            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+            HStack {
+                Text("Profile Navigator")
+                Spacer()
+                Text("Version \(version)")
+            }
+            .font(.caption2)
+            .foregroundStyle(.tertiary)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+        }
+        .frame(width: settingsWidth, height: settingsHeight)
+        .onDeleteCommand { deleteCurrentSelection() }
+    }
+
+    private func deleteCurrentSelection() {
+        switch vm.selectedTab {
+        case .profiles:
+            if let id = vm.profileSelection,
+               let profile = vm.visibleProfiles.first(where: { $0.id == id }) {
+                vm.remove(profile)
+                vm.profileSelection = nil
+            }
+        case .rules:
+            if let domain = vm.ruleSelection,
+               let rule = vm.rules.first(where: { $0.domain == domain }) {
+                vm.removeRule(rule)
+                vm.ruleSelection = nil
+            }
+        case .neverAsk:
+            if let host = vm.blocklistSelection {
+                vm.removeBlockedHost(host)
+                vm.blocklistSelection = nil
+            }
+        }
+    }
+}
+
+// MARK: - Profiles
+
+private struct ProfilesSettingsPane: View {
+    @ObservedObject var vm: SettingsViewModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SettingsIntro(
+                title: "Visible Profiles",
+                text: "Choose which browser profiles appear in the picker. Drag to reorder; the starred profile is selected by default."
+            )
+
+            HStack {
                 Menu {
-                    ForEach(vm.addableProfiles) { p in
-                        Button(vm.displayName(for: p)) { vm.add(p) }
+                    ForEach(vm.addableProfiles) { profile in
+                        Button(vm.displayName(for: profile)) { vm.add(profile) }
                     }
                     if vm.addableProfiles.isEmpty {
-                        Text("All profiles visible").foregroundStyle(.secondary)
+                        Text("All profiles are visible").foregroundStyle(.secondary)
                     }
                 } label: {
-                    Image(systemName: "plus").frame(width: 24, height: 24)
+                    Label("Add Profile", systemImage: "plus")
                 }
-                .menuStyle(.borderlessButton)
                 .disabled(vm.addableProfiles.isEmpty)
+
+                Button(role: .destructive) {
+                    removeSelectedProfile()
+                } label: {
+                    Label("Remove", systemImage: "minus")
+                }
+                .disabled(vm.profileSelection == nil)
+
+                Spacer()
+
+                Text("⌘↑/⌘↓ reorder · Space default · Return rename")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
+
+            Toggle("Use profile symbol in the menu bar", isOn: Binding(
+                get: { vm.useProfileSymbolInMenuBar },
+                set: { vm.setUseProfileSymbolInMenuBar($0) }
+            ))
+            .help("Off by default. When enabled, the macOS menu bar status item uses a profile-themed symbol instead of the browser symbol.")
 
             List(selection: $vm.profileSelection) {
                 ForEach(vm.visibleProfiles) { profile in
@@ -31,95 +116,20 @@ struct SettingsView: View {
                 }
                 .onMove { vm.move(from: $0, to: $1) }
             }
-            .listStyle(.inset)
-            .frame(height: max(80, CGFloat(vm.visibleProfiles.count) * profileRowHeight + 4))
+            .listStyle(.inset(alternatesRowBackgrounds: true))
+            .frame(height: max(120, CGFloat(max(vm.visibleProfiles.count, 1)) * profileRowHeight + 16))
 
-            SectionFooter(hint: "⌘↑↓ reorder   Space default   ↩ rename") {
-                if let id = vm.profileSelection,
-                   let profile = vm.visibleProfiles.first(where: { $0.id == id }) {
-                    Button("Remove") { vm.remove(profile); vm.profileSelection = nil }
-                        .foregroundColor(.red).buttonStyle(.plain).font(.callout)
-                }
-            }
-
-            Divider().padding(.vertical, 8)
-
-            // ── Rules ─────────────────────────────────────────────
-            SectionHeader(title: "Domain Rules") { EmptyView() }
-
-            List(selection: $vm.ruleSelection) {
-                if vm.rules.isEmpty {
-                    Text("No remembered rules.")
-                        .foregroundStyle(.secondary).font(.callout)
-                        .listRowSeparator(.hidden)
-                } else {
-                    ForEach(vm.rules) { rule in
-                        RuleRow(domain: rule.domain, profileName: vm.profileName(for: rule.profileId))
-                            .tag(rule.domain)
-                    }
-                }
-            }
-            .listStyle(.inset)
-            .frame(height: max(50, CGFloat(max(vm.rules.count, 1)) * ruleRowHeight + 4))
-
-            SectionFooter(hint: "⌫ to remove") {
-                if let domain = vm.ruleSelection,
-                   let rule = vm.rules.first(where: { $0.domain == domain }) {
-                    Button("Remove") { vm.removeRule(rule); vm.ruleSelection = nil }
-                        .foregroundColor(.red).buttonStyle(.plain).font(.callout)
-                }
-            }
-
-            Divider().padding(.vertical, 8)
-
-            // ── Never Ask ─────────────────────────────────────────
-            SectionHeader(title: "Never Ask") { EmptyView() }
-
-            List(selection: $vm.blocklistSelection) {
-                if vm.blockedHosts.isEmpty {
-                    Text("No blocked sites.")
-                        .foregroundStyle(.secondary).font(.callout)
-                        .listRowSeparator(.hidden)
-                } else {
-                    ForEach(vm.blockedHosts, id: \.self) { host in
-                        Text(host).padding(.vertical, 2).tag(host)
-                    }
-                }
-            }
-            .listStyle(.inset)
-            .frame(height: max(50, CGFloat(max(vm.blockedHosts.count, 1)) * ruleRowHeight + 4))
-
-            SectionFooter(hint: "⌫ to remove") {
-                if let host = vm.blocklistSelection {
-                    Button("Remove") { vm.removeBlockedHost(host); vm.blocklistSelection = nil }
-                        .foregroundColor(.red).buttonStyle(.plain).font(.callout)
-                }
-            }
-        }
-        .padding(16)
-        .frame(width: 480)
-        .safeAreaInset(edge: .bottom) {
-            let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-            Text("Version \(version)")
-                .font(.caption2).foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.horizontal, 16).padding(.bottom, 10)
-        }
-        .onDeleteCommand {
-            if let id = vm.profileSelection,
-               let p = vm.visibleProfiles.first(where: { $0.id == id }) {
-                vm.remove(p); vm.profileSelection = nil
-            } else if let domain = vm.ruleSelection,
-                      let rule = vm.rules.first(where: { $0.domain == domain }) {
-                vm.removeRule(rule); vm.ruleSelection = nil
-            } else if let host = vm.blocklistSelection {
-                vm.removeBlockedHost(host); vm.blocklistSelection = nil
-            }
+            Spacer()
         }
     }
-}
 
-// MARK: - Profile row
+    private func removeSelectedProfile() {
+        guard let id = vm.profileSelection,
+              let profile = vm.visibleProfiles.first(where: { $0.id == id }) else { return }
+        vm.remove(profile)
+        vm.profileSelection = nil
+    }
+}
 
 private struct ProfileRow: View {
     let profile: Profile
@@ -133,12 +143,14 @@ private struct ProfileRow: View {
     private var isDefault: Bool { vm.defaultProfileId == profile.id }
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Image(systemName: "line.3.horizontal")
-                .foregroundStyle(.tertiary).font(.caption).frame(width: 16)
+                .foregroundStyle(.tertiary)
+                .font(.caption)
+                .frame(width: 18)
 
             if isEditing {
-                TextField("", text: $editText)
+                TextField("Profile name", text: $editText)
                     .textFieldStyle(.roundedBorder)
                     .focused($fieldFocused)
                     .onSubmit { commit() }
@@ -146,24 +158,25 @@ private struct ProfileRow: View {
             } else {
                 Text(displayName)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    // simultaneousGesture lets double-click fire alongside List's single-click selection
                     .simultaneousGesture(TapGesture(count: 2).onEnded { beginEdit() })
 
                 Text(profile.browserApp)
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
 
                 Button(action: { vm.setDefault(profile) }) {
                     Image(systemName: isDefault ? "star.fill" : "star")
                         .foregroundStyle(isDefault ? Color.yellow : Color.secondary)
                 }
                 .buttonStyle(.plain)
+                .help(isDefault ? "Default profile" : "Set as default")
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 3)
         .onChange(of: isEditing) { editing in
             if editing {
                 editText = displayName
-                // Defer focus assignment until TextField is in the view hierarchy
                 DispatchQueue.main.async { fieldFocused = true }
             }
         }
@@ -184,49 +197,273 @@ private struct ProfileRow: View {
     }
 }
 
-// MARK: - Rule row
+// MARK: - Rules
 
-private struct RuleRow: View {
-    let domain: String
-    let profileName: String
+private struct RulesSettingsPane: View {
+    @ObservedObject var vm: SettingsViewModel
+    @State private var searchText = ""
+
+    private var filteredRules: [DomainRule] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return vm.rules }
+        return vm.rules.filter { rule in
+            rule.domain.lowercased().contains(query)
+            || vm.profileName(for: rule.profileId).lowercased().contains(query)
+        }
+    }
+
+    private var profileChoices: [Profile] {
+        vm.visibleProfiles
+    }
 
     var body: some View {
-        HStack {
-            Text(domain).frame(maxWidth: .infinity, alignment: .leading)
-            Image(systemName: "arrow.right").foregroundStyle(.secondary).font(.caption)
-            Text(profileName).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 12) {
+            SettingsIntro(
+                title: "Remembered Rules",
+                text: "Rules tell Profile Navigator to open matching domains or file paths with a specific profile."
+            )
+
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search domains, paths, or profiles", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+
+                if !searchText.isEmpty {
+                    Button("Clear") { searchText = "" }
+                        .buttonStyle(.borderless)
+                }
+            }
+
+            Table(filteredRules, selection: $vm.ruleSelection) {
+                TableColumn("Domain or Path") { rule in
+                    Text(rule.domain)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .help(rule.domain)
+                }
+                .width(min: 260, ideal: 390)
+
+                TableColumn("Profile") { rule in
+                    Picker("Profile", selection: ruleProfileBinding(rule)) {
+                        ForEach(profileChoices) { profile in
+                            Text(vm.displayName(for: profile)).tag(profile.id)
+                        }
+                    }
+                    .labelsHidden()
+                    .controlSize(.small)
+                    .frame(maxWidth: 160, alignment: .leading)
+                    .help("Change profile for this rule")
+                }
+                .width(min: 130, ideal: 160, max: 190)
+
+                TableColumn("") { rule in
+                    Button(role: .destructive) {
+                        remove(rule)
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Delete rule")
+                }
+                .width(36)
+            }
+            .tableStyle(.bordered(alternatesRowBackgrounds: true))
+            .overlay {
+                if vm.rules.isEmpty {
+                    EmptyStateView(
+                        title: "No Remembered Rules",
+                        systemImage: "link",
+                        message: "Pick “This site” or “This page” when opening a link to create one."
+                    )
+                } else if filteredRules.isEmpty {
+                    EmptyStateView(
+                        title: "No Matches",
+                        systemImage: "magnifyingglass",
+                        message: "Try a different search term."
+                    )
+                }
+            }
+
+            HStack {
+                Button(role: .destructive) {
+                    removeSelectedRule()
+                } label: {
+                    Label("Delete Selected Rule", systemImage: "trash")
+                }
+                .disabled(vm.ruleSelection == nil)
+                .keyboardShortcut(.delete, modifiers: [])
+
+                Spacer()
+
+                Text("Change profiles in the Profile column. Select a row and press Delete to remove it.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
-        .padding(.vertical, 2)
+    }
+
+    private func ruleProfileBinding(_ rule: DomainRule) -> Binding<String> {
+        Binding(
+            get: {
+                vm.rules.first(where: { $0.id == rule.id })?.profileId ?? rule.profileId
+            },
+            set: { newProfileId in
+                vm.setRuleProfile(rule, profileId: newProfileId)
+            }
+        )
+    }
+
+    private func remove(_ rule: DomainRule) {
+        vm.removeRule(rule)
+        if vm.ruleSelection == rule.domain { vm.ruleSelection = nil }
+    }
+
+    private func removeSelectedRule() {
+        guard let domain = vm.ruleSelection,
+              let rule = vm.rules.first(where: { $0.domain == domain }) else { return }
+        remove(rule)
     }
 }
 
-// MARK: - Layout helpers
+// MARK: - Never Ask
 
-private struct SectionHeader<Trailing: View>: View {
+private struct NeverAskSettingsPane: View {
+    @ObservedObject var vm: SettingsViewModel
+    @State private var searchText = ""
+
+    private var blockedRows: [BlockedHostRow] {
+        let rows = vm.blockedHosts.map(BlockedHostRow.init)
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !query.isEmpty else { return rows }
+        return rows.filter { $0.host.lowercased().contains(query) }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SettingsIntro(
+                title: "Never Ask",
+                text: "Hosts in this list bypass the picker. Remove a host if you want Profile Navigator to ask again."
+            )
+
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search hosts", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+
+                if !searchText.isEmpty {
+                    Button("Clear") { searchText = "" }
+                        .buttonStyle(.borderless)
+                }
+            }
+
+            Table(blockedRows, selection: $vm.blocklistSelection) {
+                TableColumn("Host") { row in
+                    Text(row.host)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .help(row.host)
+                }
+
+                TableColumn("") { row in
+                    Button(role: .destructive) {
+                        remove(row.host)
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Remove host")
+                }
+                .width(36)
+            }
+            .tableStyle(.bordered(alternatesRowBackgrounds: true))
+            .overlay {
+                if vm.blockedHosts.isEmpty {
+                    EmptyStateView(
+                        title: "No Blocked Hosts",
+                        systemImage: "hand.raised",
+                        message: "Use “Never” in the picker to add a host here."
+                    )
+                } else if blockedRows.isEmpty {
+                    EmptyStateView(
+                        title: "No Matches",
+                        systemImage: "magnifyingglass",
+                        message: "Try a different search term."
+                    )
+                }
+            }
+
+            HStack {
+                Button(role: .destructive) {
+                    removeSelectedHost()
+                } label: {
+                    Label("Remove Selected Host", systemImage: "trash")
+                }
+                .disabled(vm.blocklistSelection == nil)
+                .keyboardShortcut(.delete, modifiers: [])
+
+                Spacer()
+            }
+        }
+    }
+
+    private func remove(_ host: String) {
+        vm.removeBlockedHost(host)
+        if vm.blocklistSelection == host { vm.blocklistSelection = nil }
+    }
+
+    private func removeSelectedHost() {
+        guard let host = vm.blocklistSelection else { return }
+        remove(host)
+    }
+}
+
+private struct BlockedHostRow: Identifiable {
+    let host: String
+    var id: String { host }
+
+    init(_ host: String) {
+        self.host = host
+    }
+}
+
+// MARK: - Shared UI
+
+private struct SettingsIntro: View {
     let title: String
-    @ViewBuilder let trailing: () -> Trailing
+    let text: String
 
     var body: some View {
-        HStack {
-            Text(title.uppercased())
-                .font(.caption).fontWeight(.semibold).foregroundStyle(.secondary)
-            Spacer()
-            trailing()
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+            Text(text)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.bottom, 4)
     }
 }
 
-private struct SectionFooter<Leading: View>: View {
-    let hint: String
-    @ViewBuilder let leading: () -> Leading
+private struct EmptyStateView: View {
+    let title: String
+    let systemImage: String
+    let message: String
 
     var body: some View {
-        HStack {
-            leading()
-            Spacer()
-            Text(hint).font(.caption2).foregroundStyle(.tertiary)
+        VStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.system(size: 28))
+                .foregroundStyle(.tertiary)
+            Text(title)
+                .font(.headline)
+            Text(message)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 300)
         }
-        .frame(height: 24).padding(.top, 4)
+        .padding()
     }
 }
