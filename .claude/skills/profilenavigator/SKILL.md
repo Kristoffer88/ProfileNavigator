@@ -5,10 +5,9 @@ description: Inspect or configure Profile Navigator profiles, domain routing, de
 
 # Profile Navigator
 
-Run the CLI from its project root:
+From a ProfileNavigator checkout, run the CLI at the project root:
 
 ```bash
-cd /Users/kristoffer/projects/personal/ProfileNavigator
 bun cli/src/index.ts <command>
 ```
 

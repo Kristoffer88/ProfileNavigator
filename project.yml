@@ -40,3 +40,16 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.profilenavigator
         DEVELOPMENT_TEAM: QW83PV2H7U
         INSTALL_PATH: /usr/local/bin
+
+  ProfileNavigatorTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: ProfileNavigatorTests
+    dependencies:
+      - target: ProfileNavigator
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.ProfileNavigatorTests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGNING_ALLOWED: NO

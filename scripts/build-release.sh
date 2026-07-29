@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 VERSION=$(grep 'MARKETING_VERSION' "$PROJECT_DIR/project.yml" | awk '{print $2}' | tr -d '"')
@@ -25,8 +25,7 @@ xcodebuild archive \
   -scheme "$SCHEME" \
   -configuration Release \
   -archivePath "$ARCHIVE_PATH" \
-  CODE_SIGN_STYLE=Automatic \
-  | grep -E "^(error:|warning:|Build succeeded|Build FAILED|===)" || true
+  CODE_SIGN_STYLE=Automatic
 
 mkdir -p "$EXPORT_PATH"
 
@@ -48,8 +47,7 @@ EOF
   xcodebuild -exportArchive \
     -archivePath "$ARCHIVE_PATH" \
     -exportPath "$EXPORT_PATH" \
-    -exportOptionsPlist "$EXPORT_OPTIONS" \
-    | grep -E "^(error:|warning:|Export succeeded|Export FAILED|===)" || true
+    -exportOptionsPlist "$EXPORT_OPTIONS"
 else
   # Ad-hoc signed: copy .app from archive and sign with local identity
   echo "==> Ad-hoc signing (no Developer ID required)"

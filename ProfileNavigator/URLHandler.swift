@@ -51,9 +51,13 @@ class URLHandler {
     static func unwrapSafeLinks(_ url: URL) -> URL? {
         guard let host = url.host?.lowercased() else { return nil }
 
-        let isSafeLink =
-            host.hasSuffix(".safelinks.protection.outlook.com") ||
-            (host.contains("teams.cdn.office.net") && url.path.contains("safelinks"))
+        let isOutlookSafeLink =
+            host == "safelinks.protection.outlook.com" ||
+            host.hasSuffix(".safelinks.protection.outlook.com")
+        let isTeamsSafeLink =
+            (host == "teams.cdn.office.net" || host.hasSuffix(".teams.cdn.office.net")) &&
+            url.path.contains("safelinks")
+        let isSafeLink = isOutlookSafeLink || isTeamsSafeLink
 
         guard isSafeLink,
               let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
