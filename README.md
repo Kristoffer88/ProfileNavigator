@@ -19,6 +19,12 @@ When you click a link anywhere on your Mac, Profile Navigator shows a small pick
 
 ## Install
 
+### Homebrew
+
+```sh
+brew install --cask kristoffer88/tap/profile-navigator
+```
+
 ### Build from source
 
 1. Install [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
@@ -29,7 +35,7 @@ When you click a link anywhere on your Mac, Profile Navigator shows a small pick
    xcodegen
    ```
 3. Open `ProfileNavigator.xcodeproj` and build (⌘B)
-4. Copy `Profile Navigator.app` to `/Applications`
+4. Copy `ProfileNavigator.app` to `/Applications`
 
 ### Set as default browser
 
@@ -44,7 +50,7 @@ Click any link — the picker appears. Use the keyboard or click to choose a pro
 | `↑` / `↓` | Navigate |
 | `1`–`9` | Open profile directly |
 | `Enter` | Confirm selection |
-| `R` or `Tab` | Toggle "Remember for this domain" |
+| `R` or `Tab` | Cycle through site, page, one-time, and never-ask modes |
 | `Esc` | Cancel |
 
 ### Menu bar
@@ -53,21 +59,26 @@ Click the Profile Navigator icon in the menu bar to set a default profile or rem
 
 ### CLI
 
-A companion CLI tool is included for scripting:
+A Bun-based CLI is included for scripting from a repository checkout. Install its dependencies once with `bun install --cwd cli`, then run:
 
 ```
-profilenavigator profiles                    # list detected profiles
-profilenavigator default get                 # show current default
-profilenavigator default set <id>            # set default profile
-profilenavigator rules list                  # show remembered domain rules
-profilenavigator rules remove <host>         # remove a rule
-profilenavigator filter set <id> [<id>...]   # show only specific profiles
-profilenavigator filter clear                # show all profiles
+bun cli/src/index.ts profiles                    # list detected profiles
+bun cli/src/index.ts default get                 # show current default
+bun cli/src/index.ts default set <id>            # set default profile
+bun cli/src/index.ts rules list                  # show remembered domain rules
+bun cli/src/index.ts rules set <host> <id>       # add or update a rule
+bun cli/src/index.ts rules remove <host>         # remove a rule
+bun cli/src/index.ts filter set <id> [<id>...]   # show only specific profiles
+bun cli/src/index.ts filter clear                # show all profiles
+bun cli/src/index.ts never list                  # list hosts that bypass the picker
+bun cli/src/index.ts never remove <host>         # ask again for a host
 ```
+
+Add `--json` to any CLI command for machine-readable output.
 
 ## How it works
 
-Profile Navigator registers itself as the handler for `http://` and `https://` URLs. When a link is opened, it reads browser profile data from `~/Library/Application Support/<browser>/Local State`, presents the picker, then launches the chosen browser via `/usr/bin/open -a <browser> --args --profile-directory=<dir>`.
+Profile Navigator registers itself as the handler for `http://` and `https://` URLs. When a link is opened, it reads browser profile data from `~/Library/Application Support/<browser>/Local State`, presents the picker, then launches the browser executable with `--profile-directory=<dir>`. A running Chromium browser forwards the request to the selected profile.
 
 Config is stored at `~/Library/Application Support/ProfileNavigator/config.json`.
 

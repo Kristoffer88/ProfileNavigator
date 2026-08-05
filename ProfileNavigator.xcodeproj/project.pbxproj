@@ -11,16 +11,12 @@
 		334B3798375C8A2BE48A2D58 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 083131959792E259ADABFA20 /* Profile.swift */; };
 		44F66F77337346AD02E358DC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF024EE2F7026AC53AF0A68F /* main.swift */; };
 		4CCD1ABB910A1307CE0855F9 /* URLHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B731B8FB1AADE82485C5706 /* URLHandlerTests.swift */; };
-		556C52A7DC4E1B9399F678EE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A69F530544151F29C38E2ABE /* main.swift */; };
-		56226E0908E43122B7A12DB9 /* ConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF24B70AFED06BAFEF360ED /* ConfigStore.swift */; };
 		7014CCB028F81C424200A77E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B40110BD87F0A94BC2C83D /* AppDelegate.swift */; };
 		8BE565A6CE6BFFA8AC68C7A3 /* BrowserLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8FD641CEDB27B786027E92 /* BrowserLauncher.swift */; };
 		95D550492980C55388ED2A47 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2ABADA416F8B6633D7F151 /* SettingsView.swift */; };
 		981F410D5D9808B93742C8EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D97AD22FE9A81CAAEC52AFB /* Assets.xcassets */; };
-		AB0FAC1E8734C647595FF4ED /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 083131959792E259ADABFA20 /* Profile.swift */; };
 		ACD79C59ADEF9FEAEE797D96 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586B1B1F179C05AB5464C80D /* SettingsViewModel.swift */; };
 		C1A7F88DB41EC80C6B50360F /* PickerWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B69D2F521E064A2A380CA7 /* PickerWindowController.swift */; };
-		C9666E5F1AE79C3BE69206E5 /* ProfileDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE0D39443249C33D29D4760 /* ProfileDetector.swift */; };
 		CECCD926D4A79B0B86BEDC4F /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32456092F2897BDFECCD64CA /* SettingsWindowController.swift */; };
 		DCD858BED77BF703FD4EC246 /* ConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF24B70AFED06BAFEF360ED /* ConfigStore.swift */; };
 		DEAEDB2E9E2069BB8AFC7F4E /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99716F969C9E260E0B26A351 /* PickerView.swift */; };
@@ -55,10 +51,8 @@
 		95B40110BD87F0A94BC2C83D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99716F969C9E260E0B26A351 /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		9D97AD22FE9A81CAAEC52AFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A69F530544151F29C38E2ABE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C44730C02B478957288E2734 /* ProfileNavigator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProfileNavigator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE5768ECA418AD9A047F96D2 /* ProfileNavigatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProfileNavigatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F9CF3E7A9A5F8AB656F73E6C /* profilenavigator */ = {isa = PBXFileReference; includeInIndex = 0; path = profilenavigator; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF024EE2F7026AC53AF0A68F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,19 +69,10 @@
 			isa = PBXGroup;
 			children = (
 				C3F999514FDB46FCCBDBD8DE /* ProfileNavigator */,
-				360D2AD2D5BFA58514BF3715 /* profilenavigator-cli */,
 				0034492A92D4B1FC70CE54FD /* ProfileNavigatorTests */,
 				441C2F2AF2CFA9EF6F1B8DC6 /* Shared */,
 				8288B919DD56E87718F37EF5 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		360D2AD2D5BFA58514BF3715 /* profilenavigator-cli */ = {
-			isa = PBXGroup;
-			children = (
-				A69F530544151F29C38E2ABE /* main.swift */,
-			);
-			path = "profilenavigator-cli";
 			sourceTree = "<group>";
 		};
 		441C2F2AF2CFA9EF6F1B8DC6 /* Shared */ = {
@@ -103,7 +88,6 @@
 		8288B919DD56E87718F37EF5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F9CF3E7A9A5F8AB656F73E6C /* profilenavigator */,
 				C44730C02B478957288E2734 /* ProfileNavigator.app */,
 				EE5768ECA418AD9A047F96D2 /* ProfileNavigatorTests.xctest */,
 			);
@@ -133,23 +117,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0C052B3D17D27C13A3E81254 /* profilenavigator */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0893CE0ACCC33B0D9568D7B9 /* Build configuration list for PBXNativeTarget "profilenavigator" */;
-			buildPhases = (
-				96C4B4DB8DBBED1252B8867F /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = profilenavigator;
-			packageProductDependencies = (
-			);
-			productName = profilenavigator;
-			productReference = F9CF3E7A9A5F8AB656F73E6C /* profilenavigator */;
-			productType = "com.apple.product-type.tool";
-		};
 		200D7CE790669224DAE91743 /* ProfileNavigatorTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C47D732AAC319E3E5E414C2F /* Build configuration list for PBXNativeTarget "ProfileNavigatorTests" */;
@@ -195,9 +162,6 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					0C052B3D17D27C13A3E81254 = {
-						DevelopmentTeam = QW83PV2H7U;
-					};
 					7E0E87CD7C0F6CE54FC8A51A = {
 						DevelopmentTeam = QW83PV2H7U;
 						ProvisioningStyle = Automatic;
@@ -220,7 +184,6 @@
 			targets = (
 				7E0E87CD7C0F6CE54FC8A51A /* ProfileNavigator */,
 				200D7CE790669224DAE91743 /* ProfileNavigatorTests */,
-				0C052B3D17D27C13A3E81254 /* profilenavigator */,
 			);
 		};
 /* End PBXProject section */
@@ -265,17 +228,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		96C4B4DB8DBBED1252B8867F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				56226E0908E43122B7A12DB9 /* ConfigStore.swift in Sources */,
-				AB0FAC1E8734C647595FF4ED /* Profile.swift in Sources */,
-				C9666E5F1AE79C3BE69206E5 /* ProfileDetector.swift in Sources */,
-				556C52A7DC4E1B9399F678EE /* main.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -287,21 +239,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		434B156BC21C3D6475AA0D84 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = QW83PV2H7U;
-				INSTALL_PATH = /usr/local/bin;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kristoffer.profilenavigator;
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
 		594D6D0802081F61B23A09E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -499,33 +436,9 @@
 			};
 			name = Debug;
 		};
-		CEF7F512ABDE9C1E00050F4F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = QW83PV2H7U;
-				INSTALL_PATH = /usr/local/bin;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.kristoffer.profilenavigator;
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0893CE0ACCC33B0D9568D7B9 /* Build configuration list for PBXNativeTarget "profilenavigator" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				434B156BC21C3D6475AA0D84 /* Debug */,
-				CEF7F512ABDE9C1E00050F4F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		73659242010339E9477D5F66 /* Build configuration list for PBXProject "ProfileNavigator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -1,10 +1,11 @@
 import Cocoa
 
-class StatusBarController {
+class StatusBarController: NSObject, NSMenuDelegate {
     private var statusItem: NSStatusItem
 
-    init() {
+    override init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        super.init()
         refreshAppearance()
         rebuildMenu()
     }
@@ -32,7 +33,18 @@ class StatusBarController {
     }
 
     func rebuildMenu() {
-        let menu = NSMenu()
+        let menu = statusItem.menu ?? NSMenu()
+        menu.delegate = self
+        populate(menu)
+        statusItem.menu = menu
+    }
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        populate(menu)
+    }
+
+    private func populate(_ menu: NSMenu) {
+        menu.removeAllItems()
         let profiles = ProfileDetector.visible()
         let config = ConfigStore.shared.config
 
@@ -67,7 +79,6 @@ class StatusBarController {
         settings.target = self
         menu.addItem(withTitle: "Quit Profile Navigator", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
-        statusItem.menu = menu
     }
 
     @objc func setDefault(_ sender: NSMenuItem) {

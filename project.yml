@@ -29,18 +29,6 @@ targets:
         ENABLE_HARDENED_RUNTIME: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 
-  profilenavigator:
-    type: tool
-    platform: macOS
-    sources:
-      - path: profilenavigator-cli
-      - path: Shared
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.kristoffer.profilenavigator
-        DEVELOPMENT_TEAM: QW83PV2H7U
-        INSTALL_PATH: /usr/local/bin
-
   ProfileNavigatorTests:
     type: bundle.unit-test
     platform: macOS

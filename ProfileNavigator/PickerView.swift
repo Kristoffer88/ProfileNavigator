@@ -35,16 +35,18 @@ struct PickerView: View {
             // Profile list
             VStack(spacing: 2) {
                 ForEach(Array(state.profiles.enumerated()), id: \.element.id) { index, profile in
-                    ProfileRow(
-                        profile: profile,
-                        index: index,
-                        isSelected: state.selectedIndex == index
-                    )
-                    .contentShape(Rectangle())
-                    .onTapGesture {
+                    Button {
                         state.selectedIndex = index
                         state.confirm()
+                    } label: {
+                        ProfileRow(
+                            profile: profile,
+                            index: index,
+                            isSelected: state.selectedIndex == index
+                        )
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Opens the link with this profile")
                 }
             }
             .padding(8)
@@ -67,7 +69,7 @@ struct PickerView: View {
                     hintKey("Esc") + Text(" cancel")
                 }
                 .font(.caption2)
-                .foregroundColor(Color.secondary.opacity(0.5))
+                .foregroundStyle(Color.secondary.opacity(0.5))
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 9)
@@ -115,7 +117,10 @@ private struct ProfileRow: View {
     let index: Int
     let isSelected: Bool
 
-    var shortcutLabel: String { "\(index + 1)" }
+    var shortcutLabel: String? {
+        let number = index + 1
+        return number <= 9 ? "\(number)" : nil
+    }
 
     var body: some View {
         HStack(spacing: 10) {
@@ -134,15 +139,17 @@ private struct ProfileRow: View {
             Spacer()
 
             // Number badge
-            Text(shortcutLabel)
-                .font(.system(.caption, design: .monospaced))
-                .foregroundColor(isSelected ? .accentColor : Color.secondary.opacity(0.5))
-                .padding(.horizontal, 5)
-                .padding(.vertical, 2)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.08))
-                )
+            if let shortcutLabel {
+                Text(shortcutLabel)
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary.opacity(0.5))
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(isSelected ? Color.accentColor.opacity(0.12) : Color.secondary.opacity(0.08))
+                    )
+            }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)

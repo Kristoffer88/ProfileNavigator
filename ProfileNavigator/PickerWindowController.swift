@@ -105,7 +105,8 @@ class PickerWindowController: NSWindowController {
                 case .page:  ruleKey = url.path
                 case .never, .block: ruleKey = nil
                 }
-            } else if let host = url.host, !host.isEmpty {
+            } else if let rawHost = url.host, !rawHost.isEmpty {
+                let host = rawHost.lowercased()
                 switch rememberMode {
                 case .site:  ruleKey = host
                 case .page:  ruleKey = host + url.path
@@ -120,8 +121,8 @@ class PickerWindowController: NSWindowController {
             if rememberMode == .block, let host = url.host, !host.isEmpty {
                 ConfigStore.shared.addToBlocklist(host: host)
             }
-            BrowserLauncher.open(url: url, profile: profile)
             self?.close()
+            URLHandler.shared.open(url: url, profile: profile)
             if let appDelegate = NSApp.delegate as? AppDelegate {
                 appDelegate.statusBar?.rebuildMenu()
             }

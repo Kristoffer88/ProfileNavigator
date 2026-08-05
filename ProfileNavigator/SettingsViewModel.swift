@@ -32,6 +32,8 @@ class SettingsViewModel: ObservableObject {
         return allDetectedProfiles.filter { !visibleIds.contains($0.id) }
     }
 
+    var canRemoveVisibleProfile: Bool { visibleProfiles.count > 1 }
+
     init() { reload() }
 
     func reload() {
@@ -40,7 +42,7 @@ class SettingsViewModel: ObservableObject {
         defaultProfileId = config.defaultProfileId
         useProfileSymbolInMenuBar = config.useProfileSymbolInMenuBar ?? false
 
-        if let ids = config.visibleProfileIds, !ids.isEmpty {
+        if let ids = config.visibleProfileIds {
             visibleProfiles = ids.compactMap { id in allDetectedProfiles.first(where: { $0.id == id }) }
         } else {
             visibleProfiles = allDetectedProfiles
@@ -69,6 +71,7 @@ class SettingsViewModel: ObservableObject {
         }
         ConfigStore.shared.config = c
         objectWillChange.send()
+        refreshStatusMenu()
     }
 
     // MARK: - Profiles
@@ -92,6 +95,7 @@ class SettingsViewModel: ObservableObject {
     }
 
     func remove(_ profile: Profile) {
+        guard canRemoveVisibleProfile else { return }
         visibleProfiles.removeAll { $0.id == profile.id }
         saveVisibleProfiles()
     }
@@ -104,6 +108,7 @@ class SettingsViewModel: ObservableObject {
     func setDefault(_ profile: Profile) {
         defaultProfileId = profile.id
         ConfigStore.shared.setDefault(profileId: profile.id)
+        refreshStatusMenu()
     }
 
     func setUseProfileSymbolInMenuBar(_ enabled: Bool) {
@@ -116,6 +121,7 @@ class SettingsViewModel: ObservableObject {
         var c = ConfigStore.shared.config
         c.visibleProfileIds = visibleProfiles.map(\.id)
         ConfigStore.shared.config = c
+        refreshStatusMenu()
     }
 
     // MARK: - Rules
@@ -125,16 +131,19 @@ class SettingsViewModel: ObservableObject {
         if let idx = rules.firstIndex(where: { $0.id == rule.id }) {
             rules[idx] = DomainRule(domain: rule.domain, profileId: profileId)
         }
+        refreshStatusMenu()
     }
 
     func removeRule(_ rule: DomainRule) {
         ConfigStore.shared.removeRule(host: rule.domain)
         rules.removeAll { $0.id == rule.id }
+        refreshStatusMenu()
     }
 
     func removeBlockedHost(_ host: String) {
         ConfigStore.shared.removeFromBlocklist(host: host)
         blockedHosts.removeAll { $0 == host }
+        refreshStatusMenu()
     }
 
     // MARK: - Display name for a rule's target profile
@@ -142,5 +151,9 @@ class SettingsViewModel: ObservableObject {
     func profileName(for profileId: String) -> String {
         let profile = allDetectedProfiles.first(where: { $0.id == profileId })
         return profile.map { displayName(for: $0) } ?? profileId
+    }
+
+    private func refreshStatusMenu() {
+        (NSApp.delegate as? AppDelegate)?.statusBar?.rebuildMenu()
     }
 }

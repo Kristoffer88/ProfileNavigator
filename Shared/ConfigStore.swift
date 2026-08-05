@@ -11,6 +11,7 @@ struct Config: Codable {
     init() {
         defaultProfileId = nil
         rules = nil
+        blocklist = nil
         visibleProfileIds = nil
         displayNameOverrides = nil
         useProfileSymbolInMenuBar = nil
@@ -24,23 +25,33 @@ class ConfigStore {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support")
         let dir = support.appendingPathComponent("ProfileNavigator")
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        do {
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        } catch {
+            NSLog("ConfigStore: could not create config directory — %@", error.localizedDescription)
+        }
         return dir.appendingPathComponent("config.json")
     }()
 
     var config: Config {
         get {
-            guard let data = try? Data(contentsOf: configURL),
-                  let decoded = try? JSONDecoder().decode(Config.self, from: data) else {
+            guard FileManager.default.fileExists(atPath: configURL.path) else { return Config() }
+            do {
+                let data = try Data(contentsOf: configURL)
+                return try JSONDecoder().decode(Config.self, from: data)
+            } catch {
+                NSLog("ConfigStore: could not load config — %@", error.localizedDescription)
                 return Config()
             }
-            return decoded
         }
         set {
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            if let data = try? encoder.encode(newValue) {
-                try? data.write(to: configURL)
+            do {
+                let data = try encoder.encode(newValue)
+                try data.write(to: configURL, options: .atomic)
+            } catch {
+                NSLog("ConfigStore: could not save config — %@", error.localizedDescription)
             }
         }
     }
@@ -59,15 +70,19 @@ class ConfigStore {
     }
 
     func addToBlocklist(host: String) {
+        let host = host.lowercased()
         var c = config
         if c.blocklist == nil { c.blocklist = [] }
-        if !c.blocklist!.contains(host) { c.blocklist!.append(host) }
+        if !c.blocklist!.contains(where: { $0.caseInsensitiveCompare(host) == .orderedSame }) {
+            c.blocklist!.append(host)
+        }
         config = c
     }
 
     func removeFromBlocklist(host: String) {
+        let host = host.lowercased()
         var c = config
-        c.blocklist?.removeAll { $0 == host }
+        c.blocklist?.removeAll { $0.caseInsensitiveCompare(host) == .orderedSame }
         config = c
     }
 

@@ -44,7 +44,8 @@ struct SettingsView: View {
     private func deleteCurrentSelection() {
         switch vm.selectedTab {
         case .profiles:
-            if let id = vm.profileSelection,
+            if vm.canRemoveVisibleProfile,
+               let id = vm.profileSelection,
                let profile = vm.visibleProfiles.first(where: { $0.id == id }) {
                 vm.remove(profile)
                 vm.profileSelection = nil
@@ -94,7 +95,8 @@ private struct ProfilesSettingsPane: View {
                 } label: {
                     Label("Remove", systemImage: "minus")
                 }
-                .disabled(vm.profileSelection == nil)
+                .disabled(vm.profileSelection == nil || !vm.canRemoveVisibleProfile)
+                .help(vm.canRemoveVisibleProfile ? "Hide the selected profile" : "At least one profile must remain visible")
 
                 Spacer()
 
@@ -124,7 +126,8 @@ private struct ProfilesSettingsPane: View {
     }
 
     private func removeSelectedProfile() {
-        guard let id = vm.profileSelection,
+        guard vm.canRemoveVisibleProfile,
+              let id = vm.profileSelection,
               let profile = vm.visibleProfiles.first(where: { $0.id == id }) else { return }
         vm.remove(profile)
         vm.profileSelection = nil
@@ -213,7 +216,7 @@ private struct RulesSettingsPane: View {
     }
 
     private var profileChoices: [Profile] {
-        vm.visibleProfiles
+        vm.allDetectedProfiles
     }
 
     var body: some View {
@@ -246,6 +249,9 @@ private struct RulesSettingsPane: View {
 
                 TableColumn("Profile") { rule in
                     Picker("Profile", selection: ruleProfileBinding(rule)) {
+                        if !profileChoices.contains(where: { $0.id == rule.profileId }) {
+                            Text("Missing — \(rule.profileId)").tag(rule.profileId)
+                        }
                         ForEach(profileChoices) { profile in
                             Text(vm.displayName(for: profile)).tag(profile.id)
                         }

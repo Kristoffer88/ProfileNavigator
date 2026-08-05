@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs"
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "fs"
 import { homedir } from "os"
 import { join } from "path"
 import { Command } from "commander"
@@ -10,8 +10,10 @@ import { Command } from "commander"
 interface Config {
   defaultProfileId?: string
   rules?: Record<string, string>
+  blocklist?: string[]
   visibleProfileIds?: string[]
   displayNameOverrides?: Record<string, string>
+  useProfileSymbolInMenuBar?: boolean
 }
 
 interface Profile {
@@ -35,8 +37,11 @@ function readConfig(): Config {
 }
 
 function writeConfig(config: Config): void {
-  mkdirSync(join(homedir(), "Library/Application Support/ProfileNavigator"), { recursive: true })
-  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n")
+  const directory = join(homedir(), "Library/Application Support/ProfileNavigator")
+  const temporaryPath = `${CONFIG_PATH}.${process.pid}.tmp`
+  mkdirSync(directory, { recursive: true })
+  writeFileSync(temporaryPath, JSON.stringify(config, null, 2) + "\n")
+  renameSync(temporaryPath, CONFIG_PATH)
 }
 
 // --- Profile detection ---
@@ -54,10 +59,13 @@ const BROWSERS = [
 
 function detectProfiles(): Profile[] {
   const support = join(homedir(), "Library/Application Support")
+  const applicationDirectories = ["/Applications", join(homedir(), "Applications")]
   const profiles: Profile[] = []
 
   for (const browser of BROWSERS) {
-    if (!existsSync(`/Applications/${browser.appName}.app`)) continue
+    if (!applicationDirectories.some(directory =>
+      existsSync(join(directory, `${browser.appName}.app`))
+    )) continue
 
     const localState = join(support, browser.dataPath, "Local State")
     if (!existsSync(localState)) continue
@@ -88,6 +96,19 @@ function detectProfiles(): Profile[] {
     if (b.directoryName === "Default") return 1
     return a.directoryName.localeCompare(b.directoryName)
   })
+}
+
+function requireProfileId(id: string): void {
+  if (!detectProfiles().some(profile => profile.id === id)) {
+    program.error(`Unknown profile ID: ${id}\nRun "profilenavigator profiles" to list valid IDs.`)
+  }
+}
+
+function normalizeRuleKey(key: string): string {
+  if (key.startsWith("/")) return key
+  const slashIndex = key.indexOf("/")
+  if (slashIndex === -1) return key.toLowerCase()
+  return key.slice(0, slashIndex).toLowerCase() + key.slice(slashIndex)
 }
 
 // --- CLI ---
@@ -149,6 +170,7 @@ defaultCmd
   .description("Set default profile")
   .option("--json", "Output as JSON")
   .action((id: string, opts: { json?: boolean }) => {
+    requireProfileId(id)
     const config = readConfig()
     config.defaultProfileId = id
     writeConfig(config)
@@ -187,6 +209,8 @@ rulesCmd
   .description("Add or update a domain rule")
   .option("--json", "Output as JSON")
   .action((host: string, profileId: string, opts: { json?: boolean }) => {
+    requireProfileId(profileId)
+    host = normalizeRuleKey(host)
     const config = readConfig()
     if (!config.rules) config.rules = {}
     config.rules[host] = profileId
@@ -203,6 +227,7 @@ rulesCmd
   .description("Remove a domain rule")
   .option("--json", "Output as JSON")
   .action((host: string, opts: { json?: boolean }) => {
+    host = normalizeRuleKey(host)
     const config = readConfig()
     const existed = !!config.rules?.[host]
     delete config.rules?.[host]
@@ -227,11 +252,13 @@ filterCmd
       console.log(JSON.stringify({ visibleProfileIds: ids }))
       return
     }
-    if (ids && ids.length > 0) {
+    if (ids === null) {
+      console.log("No filter set — all profiles visible.")
+    } else if (ids.length === 0) {
+      console.log("The filter is empty — no profiles are visible.")
+    } else {
       console.log("Visible profiles:")
       for (const id of ids) console.log(`  ${id}`)
-    } else {
-      console.log("No filter set — all profiles visible.")
     }
   })
 
@@ -240,6 +267,7 @@ filterCmd
   .description("Show only these profiles in the picker")
   .option("--json", "Output as JSON")
   .action((ids: string[], opts: { json?: boolean }) => {
+    for (const id of ids) requireProfileId(id)
     const config = readConfig()
     config.visibleProfileIds = ids
     writeConfig(config)
@@ -262,6 +290,45 @@ filterCmd
       console.log(JSON.stringify({ visibleProfileIds: null }))
     } else {
       console.log("Filter cleared — all profiles will be visible.")
+    }
+  })
+
+// profilenavigator never list/remove
+const neverCmd = program.command("never").description("Manage hosts that bypass the picker")
+
+neverCmd
+  .command("list")
+  .description("List hosts that bypass the picker")
+  .option("--json", "Output as JSON")
+  .action((opts: { json?: boolean }) => {
+    const hosts = [...(readConfig().blocklist ?? [])].sort()
+    if (opts.json) {
+      console.log(JSON.stringify({ blockedHosts: hosts }))
+    } else if (hosts.length === 0) {
+      console.log("No hosts bypass the picker.")
+    } else {
+      for (const host of hosts) console.log(`  ${host}`)
+    }
+  })
+
+neverCmd
+  .command("remove <host>")
+  .description("Make Profile Navigator ask again for a host")
+  .option("--json", "Output as JSON")
+  .action((host: string, opts: { json?: boolean }) => {
+    host = host.toLowerCase()
+    const config = readConfig()
+    const existed = config.blocklist?.some(
+      blockedHost => blockedHost.toLowerCase() === host
+    ) ?? false
+    config.blocklist = config.blocklist?.filter(
+      blockedHost => blockedHost.toLowerCase() !== host
+    )
+    writeConfig(config)
+    if (opts.json) {
+      console.log(JSON.stringify({ removed: host, existed }))
+    } else {
+      console.log(existed ? `Removed blocked host: ${host}` : `Host was not blocked: ${host}`)
     }
   })
 

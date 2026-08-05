@@ -17,21 +17,37 @@ private let knownBrowsers: [BrowserSource] = [
 ]
 
 enum ProfileDetector {
-    /// Returns only profiles allowed by config (or all if no filter is set).
+    /// Returns only profiles allowed by config. A nil filter means all profiles;
+    /// an empty filter intentionally means no profiles.
     static func visible() -> [Profile] {
-        let all = detect()
         let config = ConfigStore.shared.config
-        let overrides = config.displayNameOverrides ?? [:]
+        return filtered(
+            detect(),
+            visibleProfileIds: config.visibleProfileIds,
+            displayNameOverrides: config.displayNameOverrides ?? [:]
+        )
+    }
 
-        func applyOverride(_ p: Profile) -> Profile {
-            guard let name = overrides[p.id] else { return p }
-            return Profile(directoryName: p.directoryName, name: name, browserApp: p.browserApp)
+    static func filtered(
+        _ profiles: [Profile],
+        visibleProfileIds: [String]?,
+        displayNameOverrides: [String: String] = [:]
+    ) -> [Profile] {
+        func applyingOverride(to profile: Profile) -> Profile {
+            guard let name = displayNameOverrides[profile.id] else { return profile }
+            return Profile(
+                directoryName: profile.directoryName,
+                name: name,
+                browserApp: profile.browserApp
+            )
         }
 
-        guard let ids = config.visibleProfileIds, !ids.isEmpty else {
-            return all.map(applyOverride)
+        guard let ids = visibleProfileIds else {
+            return profiles.map(applyingOverride)
         }
-        return ids.compactMap { id in all.first(where: { $0.id == id }).map(applyOverride) }
+        return ids.compactMap { id in
+            profiles.first(where: { $0.id == id }).map(applyingOverride)
+        }
     }
 
     static func detect() -> [Profile] {
